@@ -39,6 +39,8 @@ function App() {
     client.models.Todo.delete({ id });
   }
 
+  
+
   return (
     <main>
       <h1>{userProfile?.preferred_username}'s todos</h1>

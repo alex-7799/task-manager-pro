@@ -12,6 +12,8 @@ import {
   View,
   Text,
 } from "@aws-amplify/ui-react";
+import { createBrowserRouter, RouterProvider } from "react-router";
+import { ProtectedPath } from "./components/ProtectedPath.tsx";
 
 Amplify.configure(outputs);
 
@@ -21,10 +23,10 @@ const components = {
 
     return (
       <View textAlign={"center"} padding={tokens.space.large}>
-        <Image alt="Task Manager Pro Logo" src="./logo.svg" height="10"/>
+        <Image alt="Task Manager Pro Logo" src="./logo.svg" height="10" />
       </View>
     );
- },
+  },
   Footer() {
     const { tokens } = useTheme();
 
@@ -43,10 +45,33 @@ const components = {
   },
 };
 
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: (
+      <Authenticator components={components}>
+        <App />
+      </Authenticator>
+    ),
+    errorElement: <div>Oops! Something went wrong.</div>,
+  },
+  {
+    path: "/home",
+    element: (
+      <ProtectedPath>
+        <>
+          <h1>Home Page!</h1>
+        </>
+      </ProtectedPath>
+    ),
+    errorElement: <div>Oops! Something went wrong.</div>,
+  },
+]);
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <Authenticator components={components}>
-      <App />
-    </Authenticator>
+    <Authenticator.Provider>
+      <RouterProvider router={router} />
+    </Authenticator.Provider>
   </React.StrictMode>
 );

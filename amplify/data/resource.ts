@@ -1,17 +1,72 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
-/*== STEP 1 ===============================================================
-The section below creates a Todo database table with a "content" field. Try
-adding a new "isDone" field as a boolean. The authorization rule below
-specifies that any user authenticated via an API key can "create", "read",
-"update", and "delete" any "Todo" records.
-=========================================================================*/
 const schema = a.schema({
   Todo: a
     .model({
       content: a.string(),
     })
     .authorization((allow) => [allow.owner()]),
+  User: a
+    .model({
+      email: a.string().required(),
+      name: a.string().required(),
+      createdAt: a.datetime().required(),
+      updatedAt: a.datetime().required(),
+      lastLoginAt: a.datetime().required(),
+      projectCount: a.integer().required(),
+      projects: a.hasMany("Project", "userId"),
+    })
+    .authorization((allow) => [allow.owner()]),
+  Project: a
+    .model({
+      name: a.string().required(),
+      description: a.string(),
+      status: a.enum(["ACTIVE", "ARCHIVED"]),
+      progress: a.integer().required(),
+      deadline: a.datetime(),
+      createdAt: a.datetime().required(),
+      updatedAt: a.datetime().required(),
+      taskCount: a.integer().required(),
+      userId: a.string().required(),
+      user: a.belongsTo("User", "userId"),
+      tasks: a.hasMany("Task", "projectId"),
+    })
+    .authorization((allow) => [allow.owner()])
+    .secondaryIndexes((index)=>[index("userId")]),
+
+  Task: a
+    .model({
+      name: a.string().required(),
+      description: a.string(),
+      status: a.enum(["TODO", "IN_PROGRESS", "COMPLETED"]),
+      progress: a.integer().required(),
+      deadline: a.datetime(),
+      createdAt: a.datetime().required(),
+      updatedAt: a.datetime().required(),
+      attachmentCount: a.integer().required(),
+      projectId: a.string().required(),
+      userId: a.string().required(),
+      project: a.belongsTo("Project", "projectId"),
+      attachments: a.hasMany("Attachment", "taskId"),
+    })
+    .authorization((allow) => [allow.owner()])
+    .secondaryIndexes((index)=>[index("projectId")]),
+
+  Attachment: a
+    .model({
+      fileName: a.string().required(),
+      fileType: a.string().required(),
+      fileSize: a.integer().required(),
+      s3Key: a.string().required(),
+      createdAt: a.datetime().required(),
+      updatedAt: a.datetime().required(),
+      taskId: a.string().required(),
+      userId: a.string().required(),
+      projectId: a.string().required(),
+      task: a.belongsTo("Task", "taskId"),
+    })
+    .authorization((allow) => [allow.owner()])
+    .secondaryIndexes((index)=>[index("taskId")]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
@@ -26,32 +81,3 @@ export const data = defineData({
     },
   },
 });
-
-/*== STEP 2 ===============================================================
-Go to your frontend source code. From your client-side code, generate a
-Data client to make CRUDL requests to your table. (THIS SNIPPET WILL ONLY
-WORK IN THE FRONTEND CODE FILE.)
-
-Using JavaScript or Next.js React Server Components, Middleware, Server 
-Actions or Pages Router? Review how to generate Data clients for those use
-cases: https://docs.amplify.aws/gen2/build-a-backend/data/connect-to-API/
-=========================================================================*/
-
-/*
-"use client"
-import { generateClient } from "aws-amplify/data";
-import type { Schema } from "@/amplify/data/resource";
-
-const client = generateClient<Schema>() // use this Data client for CRUDL requests
-*/
-
-/*== STEP 3 ===============================================================
-Fetch records from the database and use them in your frontend component.
-(THIS SNIPPET WILL ONLY WORK IN THE FRONTEND CODE FILE.)
-=========================================================================*/
-
-/* For example, in a React component, you can use this snippet in your
-  function's RETURN statement */
-// const { data: todos } = await client.models.Todo.list()
-
-// return <ul>{todos.map(todo => <li key={todo.id}>{todo.content}</li>)}</ul>

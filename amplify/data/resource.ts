@@ -6,6 +6,7 @@ const schema = a.schema({
       content: a.string(),
     })
     .authorization((allow) => [allow.owner()]),
+    
   User: a
     .model({
       email: a.string().required(),
@@ -17,6 +18,7 @@ const schema = a.schema({
       projects: a.hasMany("Project", "userId"),
     })
     .authorization((allow) => [allow.owner()]),
+
   Project: a
     .model({
       name: a.string().required(),
@@ -32,7 +34,9 @@ const schema = a.schema({
       tasks: a.hasMany("Task", "projectId"),
     })
     .authorization((allow) => [allow.owner()])
-    .secondaryIndexes((index)=>[index("userId")]),
+    .secondaryIndexes((index) => [
+      index("userId").sortKeys(["createdAt"]).name("byUser"),
+    ]),
 
   Task: a
     .model({
@@ -50,7 +54,9 @@ const schema = a.schema({
       attachments: a.hasMany("Attachment", "taskId"),
     })
     .authorization((allow) => [allow.owner()])
-    .secondaryIndexes((index)=>[index("projectId")]),
+    .secondaryIndexes((index) => [
+      index("projectId").sortKeys(["createdAt"]).name("byProject"),
+    ]),
 
   Attachment: a
     .model({
@@ -66,7 +72,9 @@ const schema = a.schema({
       task: a.belongsTo("Task", "taskId"),
     })
     .authorization((allow) => [allow.owner()])
-    .secondaryIndexes((index)=>[index("taskId")]),
+    .secondaryIndexes((index) => [
+      index("taskId").sortKeys(["createdAt"]).name("byTask"),
+    ]),
 });
 
 export type Schema = ClientSchema<typeof schema>;

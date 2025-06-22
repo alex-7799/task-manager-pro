@@ -27,3 +27,7 @@ dist-ssr
 .amplify
 amplify_outputs*
 amplifyconfiguration*
+
+.secret
+.secret/*
+secret/client_secret_128000696671-edu16ar0t11lblfd2ih14hob3hp4ot37.apps.googleusercontent.com.json

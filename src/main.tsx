@@ -16,7 +16,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      <Authenticator components={AuthenticatorComponents}>
+      <Authenticator components={AuthenticatorComponents} socialProviders={["google"]}>
         <ProtectedPath>
           <Outlet />
         </ProtectedPath>

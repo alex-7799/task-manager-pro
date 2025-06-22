@@ -15,11 +15,16 @@ export const auth = defineAuth({
         attributeMapping: {
           email: "email",
           preferredUsername: "name",
-          
-        }
+        },
       },
-      callbackUrls: ["http://localhost:5173/home"],
-      logoutUrls: ["http://localhost:5173/"],
+      callbackUrls: [
+        "http://localhost:5173/home",
+        "https://main.d11ox42brp5ekq.amplifyapp.com/home",
+      ],
+      logoutUrls: [
+        "http://localhost:5173/",
+        "https://main.d11ox42brp5ekq.amplifyapp.com",
+      ],
     },
   },
   userAttributes: {
